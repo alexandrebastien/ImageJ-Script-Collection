@@ -1,2 +1,2 @@
-# ImageJ-ULaval-Misc
+# ImageJ Script Collection
 Scripts collection for ImageJ

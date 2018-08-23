@@ -1,6 +1,6 @@
 /* INSTALL ULAVAL MENU 
    ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-   Install ULaval Menu is a script to easoly modify StartupMacros.fiji.ijm
+   Install ULaval Menu is a script to easily modify StartupMacros.fiji.ijm
    in order to add ULaval menu toolbar at startup.
    
    AUTHOR  : Alexandre Bastien, Copyright (c) 2018
@@ -29,7 +29,8 @@ if (ok) {
 	
 	menu = "\"Cilia\","+
 		   "\"3D Animator\","+
-		   "\"Stitch CZI\"";
+		   "\"Stitch CZI\","+
+		   "\"TZPs Analyzer\"";
 	
 	new = "\n// START ULAVAL MENU\n"+
 	"var sCmds = newMenu(\"ULaval Menu Tool\", newArray("+menu+"));\n"+

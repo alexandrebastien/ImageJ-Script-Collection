@@ -32,6 +32,10 @@ for (i=1; i<=ch; i++) {
 }
 ch = path.length;
 
+// Set correct dir for temp files
+splitted_dir = dir+"splitted";
+stitched_dir = dir+"stitched";
+
 // If ask for splitting
 if (spl) {
 	// Find best focus on ref image
@@ -44,40 +48,41 @@ if (spl) {
 	close("*");
 
 	// Open the files and split them as tiffs
-	File.makeDirectory(dir+"splitted");
+	File.makeDirectory(splitted_dir);
 	for  (i=1; i<=ch; i++) {
 		run("Bio-Formats Importer",
 			"open=["+path[i-1]+"] color_mode=Default concatenate_series "+
 			"open_all_series rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT");
 		imID = getImageID;
 		indexZStack(ID, imID);	selectWindow("new");
-		run("Image Sequence... ", "format=TIFF digits=3 name=c"+i+"_t save=["+dir+"splitted]");
+		run("Image Sequence... ", "format=TIFF digits=3 name=c"+i+"_t save=["+splitted_dir+"]");
 		close("*");
 	}
 }
 
 // Stitch with MIST
+showStatus("Stitching..."); showProgress(0.5);
 if (stc) {
 	XY = findTilesXY(path[0]);
-	run("MIST", MISTcfg(XY,dir+"splitted",dir+"stitched",ref,-1));
+	run("MIST", MISTcfg(XY,splitted_dir,stitched_dir,ref,-1));
 	for  (i=1; i<=ch; i++) {
 		if (i!=ref) {
-			run("MIST", MISTcfg(XY,dir+"splitted",dir+"stitched",i,ref));}
+			run("MIST", MISTcfg(XY,splitted_dir,stitched_dir,i,ref));}
 }
 
 // Merge stitched
+showStatus("Merging..."); showProgress(0.8);
 if (mrg) {
 	str = "";
 	for  (i=1; i<=ch; i++) {
-		open(dir+"stitched/c"+i+"-stitched-0.tif");
+		open(stitched_dir+"/c"+i+"-stitched-0.tif");
 		rename("C"+i);
 		str = str+"c"+i+"=C"+i+" ";}
 	run("Merge Channels...", str+"create");
-	saveAs("Tiff", dir+"stitched"+File.separator+"stitched.tif");
+	rename(C[0]);
 }
+showStatus("Done"); showProgress(1);
 setBatchMode(false);
-
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // findTilesXY is a function that try to infer the tiles organisation in XY from a CZI tiles      //

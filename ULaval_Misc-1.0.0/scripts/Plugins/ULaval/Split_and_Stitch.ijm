@@ -45,7 +45,6 @@ if (spl) {
 
 	// Open the files and split them as tiffs
 	File.makeDirectory(dir+"splitted");
-	File.makeDirectory(dir+"stitched");
 	for  (i=1; i<=ch; i++) {
 		run("Bio-Formats Importer",
 			"open=["+path[i-1]+"] color_mode=Default concatenate_series "+
@@ -191,11 +190,11 @@ function MISTcfg(XY,splitted,stitched,ch,ref) {
 		pos = stitched+"\\c"+d2s(ref,0)+"-global-positions-0.txt";}
 				
 	MISTstr = "gridwidth="+XY[0]+" gridheight="+XY[1]+" starttile=0 "+
- "imagedir="+splitted+" filenamepattern=c"+ch+"_t{ppp}.tif filenamepatterntype=SEQUENTIAL "+
+ "imagedir=["+splitted+"] filenamepattern=c"+ch+"_t{ppp}.tif filenamepatterntype=SEQUENTIAL "+
  "gridorigin=UL assemblefrommetadata="+AFM+" globalpositionsfile=["+pos+"] "+
  "numberingpattern=HORIZONTALCOMBING startrow=0 startcol=0 extentwidth="+XY[0]+" "+
  "extentheight="+XY[1]+" timeslices=0 istimeslicesenabled=false "+
- "issuppresssubgridwarningenabled=false outputpath="+stitched+" displaystitching=false "+
+ "issuppresssubgridwarningenabled=false outputpath=["+stitched+"] displaystitching=false "+
  "outputfullimage=true outputmeta=true outputimgpyramid=false blendingmode=LINEAR blendingalpha=5.0 "+
  "outfileprefix=c"+ch+"- programtype=AUTO numcputhreads=8 loadfftwplan=true savefftwplan=true "+
  "fftwplantype=MEASURE fftwlibraryname=libfftw3 fftwlibraryfilename=libfftw3.dll "+

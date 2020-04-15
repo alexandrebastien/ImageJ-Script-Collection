@@ -14,7 +14,7 @@
  */
 
 // Runs in Batch Mode
-setBatchMode(true);
+setBatchMode(false);
 
 // User select folder and subfolder are created
 dir = getDirectory("Choose input directory"); list = getFileList(dir);
@@ -42,28 +42,30 @@ for (ii=0; ii<list.length; ii++) {
 		for (i=2; i<=ns; i++) {
 			selectWindow("St");
 			run("Z Project...", "stop="+i+" projection=[Max Intensity]");
-			wait(100); rename("MAX"); // Wait seems to be needed to avoid a bug
+			wait(300); rename("MAX"); // Wait seems to be needed to avoid a bug
 			run("Concatenate...", "  title=StP image1=StP image2=MAX");
 		}
 	
 		// Create left 3D animation
 		selectWindow("St");
+		if(nf>ns){run("Re-order Hyperstack ...", "channels=[Channels (c)] slices=[Frames (t)] frames=[Slices (z)]")};
 		run("3D Project...", "projection=[Brightest Point] axis=Y-Axis slice=1 initial=0 "+
 			"total=45 rotation=1 lower=1 upper=255 opacity=0 surface=100 interior=50 interpolate");
-		rename("3D-1"); makeRectangle(1, 0, w, h); run("Crop");
+		wait(300);
+		rename("3D-1"); makeRectangle(0, 0, w, h); run("Crop");
 			// Crop is needed as animation is a bit larger
 
 		// Create right 3D animation
 		selectWindow("St");
 		run("3D Project...", "projection=[Brightest Point] axis=Y-Axis slice=1 initial=315 "+
 			"total=44 rotation=1 lower=1 upper=255 opacity=0 surface=100 interior=50 interpolate");
-		rename("3D-2"); makeRectangle(1, 0, w, h); run("Crop");
+		wait(300);
+		rename("3D-2"); makeRectangle(0, 0, w, h); run("Crop");
 
 		// Convertion from slice to time frame of the main stack (St)
 		// is needed for later concatenate
 		selectWindow("St");
-		run("Re-order Hyperstack ...", "channels=[Channels (c)] slices=[Frames (t)] "+
-			"frames=[Slices (z)]");
+		run("Re-order Hyperstack ...", "channels=[Channels (c)] slices=[Frames (t)] frames=[Slices (z)]");
 
 		// For all 4 opened images:
 		//	Enhance contraste in a standardize way
@@ -75,15 +77,19 @@ for (ii=0; ii<list.length; ii++) {
 			selectWindow(imwin[i]);
 			for (j=1; j<=nc; j++) {
 				Stack.setChannel(j);
-				run("Enhance Contrast", "saturated=0.01");
+				for( k = 0; k < ns; k++) {
+				    setSlice(k+1);
+				    run("Enhance Contrast", "saturated=4 normalize");
+				}
+				//run("Enhance Contrast", "saturated=0.01");
 			}
 			run("RGB Color", "frames");
 			if (startsWith(imwin[i],"St")) { // (Only St and StP)
 				run("Interleave", "stack_1="+imwin[i]+" stack_2="+imwin[i]); rename(imwin[i]+"_tmp");
 				close(imwin[i]); selectWindow(imwin[i]+"_tmp");	rename(imwin[i]);
 			}
-			run("Duplicate...", "title="+imwin[i]+"R duplicate");
-			run("Reverse");
+			run("Duplicate...", "title="+imwin[i]+"R duplicate"); wait(300);
+			run("Reverse"); wait(300);
 		}
 		
 		// Concatenate the full animation, save as AVI and close
@@ -91,6 +97,7 @@ for (ii=0; ii<list.length; ii++) {
 			"image4=3D-1 image5=3D-1R image6=3D-2R image7=3D-2 image8=StPR");
 		run("AVI... ", "compression=JPEG frame=15 save=["+dir+"3D/"+filename+".avi]");
 		close("*");
+		
 	}
 }
 print("Finished");

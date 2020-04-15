@@ -18,7 +18,7 @@
    Ooplasm (area, roundness, intensity)
    Transzonal Projections (angle with center, distance inner, distance outter)
 
-   AUTHOR  : Alexandre Bastien, Copyright (c) 2018
+   AUTHOR  : Alexandre Bastien, Copyright (c) 2020
    EMAIL   : alexandre.bastien@fsaa.ulaval.ca 
    LICENSE : Licensed under MIT License, see file LICENSE
 */
@@ -36,9 +36,9 @@ for (jj=0; jj<filelist.length; jj++) {
 }
 
 L  = newArray(names.length); Ls  = newArray(names.length);
-I  = newArray(names.length); Is  = newArray(names.length);
 R  = newArray(names.length); Rs  = newArray(names.length);
 TZPsCount = newArray(names.length);
+Table.create("RAW data")
 
 for (jj=0; jj<names.length; jj++) {
 	open(dir+names[jj]+".tif");
@@ -48,7 +48,6 @@ for (jj=0; jj<names.length; jj++) {
 	// Do per measurements per TZP
 	len  = newArray(roiManager("count"));
 	R2   = newArray(roiManager("count"));
-	mean = newArray(roiManager("count")); 
 	kk = 0;
 	for (ii=0; ii<roiManager("count"); ii++) {
 		roiManager("Select", ii);
@@ -58,25 +57,25 @@ for (jj=0; jj<names.length; jj++) {
 			roiManager("measure");
 			R2[kk]   = Fit.rSquared;
 			len[kk]  = getResult("Length", nResults-1);
-			mean[kk] = getResult("Mean", nResults-1);
 			kk++;
 		}
 		Array.getStatistics(len, min, max, L[jj], Ls[jj]);
-		Array.getStatistics(mean, min, max, I[jj], Is[jj]);
 		Array.getStatistics(R2, min, max, R[jj], Rs[jj]);
 		TZPsCount[jj] = kk;
 	}
 	close();
+	selectWindow("RAW data");
+	Table.setColumn("Len:"+names[jj], len);
+	Table.setColumn("Str:"+names[jj], R2);
 }
 
 setBatchMode(false);
+selectWindow("Results");
 Table.reset("Results");
 Table.setColumn("Name",names);
 Table.setColumn("TZPsCount", TZPsCount);
 Table.setColumn("TZPsLength", L);
 Table.setColumn("TZPsLengthSTD", Ls);
-Table.setColumn("TZPsIntensity", I);
-Table.setColumn("TZPsIntensitySTD", Is);
 Table.setColumn("TZPsStraightness", R);
 Table.setColumn("TZPsStraightnessSTD", Rs);
 Table.update;

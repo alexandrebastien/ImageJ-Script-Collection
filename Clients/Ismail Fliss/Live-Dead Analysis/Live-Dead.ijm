@@ -2,9 +2,11 @@
 setBatchMode(true);
 
 // Get prom value
+url = "https://github.com/alexandrebastien/ImageJ-Script-Collection/tree/master/Clients/Ismail%20Fliss/Live-Dead%20Analysis";
 Dialog.create("Peak proeminence");
-Dialog.addMessage("Enter the proeminence value for peaks detection.")
+Dialog.addMessage("Enter the proeminence value for peaks detection.");
 Dialog.addNumber("Proeminence:", 1000);
+Dialog.addHelp(url);
 Dialog.show();
 prom = Dialog.getNumber();
 

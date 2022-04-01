@@ -1,5 +1,11 @@
 // Set batchmode for faster calculation
 setBatchMode(true);
+getDimensions(w, h, cc, s, ff);
+labels = newArray(ff);
+for (f = 1; f <= ff; f++) {
+	Stack.setPosition(1, 1, f);
+	labels[f-1] = getInfo("slice.label");
+}
 
 // Get prom value
 url = "https://github.com/alexandrebastien/ImageJ-Script-Collection/tree/master/Clients/Ismail%20Fliss/Live-Dead%20Analysis";
@@ -10,48 +16,55 @@ Dialog.addHelp(url);
 Dialog.show();
 prom = Dialog.getNumber();
 
-// Average channel 1 and 2, detect and add to ROIManager
-run("Duplicate...", "title=im duplicate"); run("Split Channels");
-imageCalculator("Average create", "C1-im","C1-im"); rename("avg");
-run("Find Maxima...", "prominence="+prom+" strict exclude output=[Point Selection]");
-roiManager("Add"); close("avg");
+title = getTitle();
+run("Duplicate...", "title=im-c1 duplicate channels=1");
+selectWindow(title);
+run("Duplicate...", "title=im-c2 duplicate channels=2");
+imageCalculator("Max create stack", "im-c1","im-c2"); rename("max");
+run("Merge Channels...", "c1=im-c1 c2=im-c2 c3=max create");
+rename("im"); run("Gaussian Blur...", "sigma=1 stack");
 
-// Get intensities values in ch1/2 variables
-run("Set Measurements...", "mean redirect=None decimal=3");
-selectWindow("C1-im"); roiManager("Select", 0);
-run("Measure"); ch1 = Table.getColumn("Mean");
-run("Clear Results");
-selectWindow("C2-im"); roiManager("Select", 0);
-run("Measure"); ch2 = Table.getColumn("Mean");
-run("Clear Results");
-close("C1-im"); close("C2-im");
-close("RoiManager");
 
-// Set data in table
-Table.setColumn("ch1", ch1);
-Table.setColumn("ch2", ch2);
+sum1 = newArray(); sum2 = newArray();
+sumR = newArray(); sumL = newArray();
+for (f = 1; f <= ff; f++) {
+	selectWindow("im");
+	Stack.setPosition(3, 1, f);
+	run("Find Maxima...", "prominence="+prom+
+	    " strict exclude output=[Point Selection]");
+	Roi.getCoordinates(x, y);
+	
+	Stack.setPosition(1, 1, f);
+	lx = lengthOf(x); ch1 = newArray(lx);
+	for (i = 0; i < lx; i++) {ch1[i] = getValue(x[i], y[i]);}
 
-// Calculate the ratio
-ratio = newArray(nResults);
-for (i = 0; i < nResults; i++) {
-	ratio[i] = ch2[i]/ch1[i];
+	Stack.setPosition(2, 1, f);
+	lx = lengthOf(x); ch2 = newArray(lx);
+	for (i = 0; i < lx; i++) {ch2[i] = getValue(x[i], y[i]);}	
+
+	ratio = newArray(lx);
+	for (i = 0; i < lx; i++) {ratio[i] = ch2[i]/ch1[i];}
+	
+	L = Array.fill(newArray(lx), f);
+	
+	sumL = Array.concat(sumL,L);
+	sum1 = Array.concat(sum1,ch1);
+	sum2 = Array.concat(sum2,ch2);
+	sumR = Array.concat(sumR,ratio);
+
+	// Create a plot of ch1 vs ch2
+	Plot.create(labels[f-1], "ch1", "ch2");
+	Plot.add("Dot", ch1, ch2);
+	Plot.setStyle(0, "blue,#a0a0ff,1.0,Dot");
+	Plot.show();
 }
-Table.setColumn("ratio", ratio);
+close("im");
 
-// Create a plot of ch1 vs ch2
-Plot.create("Plot of Results", "ch1", "ch2");
-Plot.add("Dot", Table.getColumn("ch1", "Results"), Table.getColumn("ch2", "Results"));
-Plot.setStyle(0, "blue,#a0a0ff,1.0,Dot");
+Table.create("Data");
+Table.setColumn("Label", sumL);
+Table.setColumn("ch1", sum1);
+Table.setColumn("ch2", sum2);
+Table.setColumn("ratio", sumR);
 
-// Output basic stats in another table
-Table.create("Summary");
-Array.getStatistics(ch1, min1, max1, mean1, sd1);
-Array.getStatistics(ch2, min2, max2, mean2, sd2);
-Array.getStatistics(ratio, minr, maxr, meanr, sdr)
-Table.setColumn("Label", newArray("min","max","mean","sd"));
-Table.setColumn("ch1", newArray(min1,max1,mean1,sd1));
-Table.setColumn("ch2", newArray(min2,max2,mean2,sd2));
-Table.setColumn("ratio", newArray(minr,maxr,meanr,sdr));
 
-// End
 setBatchMode("exit and display");

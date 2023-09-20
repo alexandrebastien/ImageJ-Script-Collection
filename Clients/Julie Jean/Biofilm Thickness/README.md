@@ -1,5 +1,7 @@
 # Biofilm Thickness Analysis
 
+<img src="https://github.com/alexandrebastien/ImageJ-Script-Collection/blob/master/Clients/Julie%20Jean/Biofilm%20Thickness/Biofilm%20sample.jpg" width="600">
+
 ## Purpose
 This script was developed by Alexandre Bastien (IBIS Microscopy Platform) for Professor Julie Jean and Nissa Niboucha from Université Laval (Québec, Québec, Canada), and is being used for a paper in publication. The credits will be updated when available. Please cite accordingly.
 

@@ -1,6 +1,6 @@
 # Auto-Correlation
 
-<img src="[https://raw.githubusercontent.com/alexandrebastien/ImageJ-Script-Collection/master/ULaval/Auto-Correlation/Auto-Correlation.png)]" width="600">
+<img src="[https://raw.githubusercontent.com/alexandrebastien/ImageJ-Script-Collection/master/ULaval/Auto-Correlation/Auto-Correlation.png]" width="600">
 
 This tool creates an auto-correlation plot from a linear selection in ImageJ.
 

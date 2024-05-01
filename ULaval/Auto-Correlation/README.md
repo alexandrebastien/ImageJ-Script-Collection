@@ -7,7 +7,6 @@ Briefly, the script extract an intensity profile from the selection and translat
 
 ## Config
 - Tolerance: The minimum amplitude needed to find a peak (%).
-- Missing: Will try to divide by 2 peaks distances. If the value is with some % [0-1] of the median it will keep the division. This is to account for missing peaks. (enter -1 to skip)
 - Outliers: Will remove outliers distances if the value is over x times a standard deviation, normally 3. (enter -1 to skip)
 
 ## Tips
